@@ -3,6 +3,10 @@ package cos418_hw1_1
 import (
 	"fmt"
 	"sort"
+	"strings"
+	"regexp"
+	"bufio"
+	"os"
 )
 
 // Find the top K most common words in a text document.
@@ -18,9 +22,45 @@ func topWords(path string, numWords int, charThreshold int) []WordCount {
 	// TODO: implement me
 	// HINT: You may find the `strings.Fields` and `strings.ToLower` functions helpful
 	// HINT: To keep only alphanumeric characters, use the regex "[^0-9a-zA-Z]+"
-	return nil
-}
+	file, err := os.Open(path)
+	checkError(err)
+	defer file.Close()
 
+	wordFreq = make(map[string]int)
+	re := regexp.MustComplie('[^0-9a-zA-Z]+')
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan(){
+
+		line := scanner.Text()
+		words := strings.Fields(strings.ToLower(re.ReplaceAllString(line, "")))
+
+		for _, word := range words {
+			if len(word) >= charThreshold {
+				wordFreq[word]++
+			}
+		}
+	}
+	checkError(scanner.Err())
+
+	var wordCounts []WordCount
+	for word, count := range wordFreq{
+		wordCounts = append (wordCounts, WordCount{Word: word, Count: count})
+	}
+
+	sortWordCounts(wordCounts)
+
+	if numWords > length(wordCounts){
+
+		return wordCounts
+	}
+	return wordCounts[:numWords]
+}
+// Helper function to handle errors
+func checkError(err error) {
+	if err != nil {
+		fmt.Println("Error:", err)
+		os.Exit(1)
+	}
 // A struct that represents how many times a word is observed in a document
 type WordCount struct {
 	Word  string
@@ -43,4 +83,17 @@ func sortWordCounts(wordCounts []WordCount) {
 		}
 		return wc1.Count > wc2.Count
 	})
+}
+func main() {
+	// Call the topWords function with:
+	// - "Mydocument.txt" as the file path
+	// - 5 as the number of top words to display
+	// - 3 as the minimum word length to consider
+	topK := topWords("Mydocument.txt", 5, 3)
+
+	// Print the results
+	fmt.Println("Top words in document:")
+	for _, word := range topK {
+		fmt.Println(word)
+	}
 }
