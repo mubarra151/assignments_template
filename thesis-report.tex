@@ -1,0 +1,81 @@
+\documentclass[11pt]{article}
+\usepackage[a4paper,margin=1in]{geometry}
+\usepackage{times}
+\usepackage{hyperref}
+\title{Prompt Injection and Data Leakage in LLM Applications}
+\author{Thesis Report Draft}
+\date{\today}
+\begin{document}
+\maketitle
+
+\begin{abstract}
+This thesis investigates two central risks in Large Language Model (LLM) applications—prompt injection and data leakage—in practical settings such as retrieval-augmented generation (RAG) and tool-using agents. We formalize threat models for direct and indirect prompt injection and for training-time versus runtime data leakage, implement representative attacks, and evaluate layered defenses. Using established analyses of indirect prompt injection in real-world systems~\cite{greshake2023prompt}, universal jailbreak-style adversarial prompts~\cite{zou2023universal}, and training-data memorization and extraction~\cite{carlini2021extracting,carlini2022quantifying}, we quantify Attack Success Rate (ASR), leakage rates, and utility trade-offs. We provide guidance for practitioners on effective mitigations, showing that layered defenses reduce risk with manageable overhead, while acknowledging limitations against adaptive attackers.
+\end{abstract}
+
+\section{Introduction}
+LLMs have rapidly transitioned from research prototypes to core components in products that retrieve external knowledge and invoke tools. This integration broadens the attack surface: adversaries can encode instructions in user inputs or untrusted documents to override system behavior (prompt injection), and can elicit model memorization or exfiltrate sensitive runtime data (data leakage). Foundational work demonstrates indirect prompt injection against deployed RAG/agent systems, leading to system prompt exposure and unsafe tool use~\cite{greshake2023prompt}. Studies on memorization reveal that LLMs can reproduce rare or verbatim content under certain conditions~\cite{carlini2021extracting,carlini2022quantifying}. Universal adversarial prompts transfer across aligned models, indicating systemic robustness challenges~\cite{zou2023universal}.
+
+This thesis focuses on (i) indirect prompt injection in RAG/agent pipelines and (ii) training-time and runtime data leakage pathways. Our contributions are: (1) a taxonomy and precise threat models tailored to common LLM integration patterns; (2) an empirical study of attacks and layered defenses; (3) measurement of security--utility trade-offs; and (4) practical, reproducible defense guidance.
+
+\section{Related Work}
+\textbf{Indirect prompt injection.} Real-world evaluations show untrusted content can steer models, leak system prompts, and trigger tool misuse~\cite{greshake2023prompt}.\newline
+\textbf{Universal/transferable adversarial prompts.} Safety alignment remains vulnerable to carefully crafted inputs, with cross-model transfer~\cite{zou2023universal}.\newline
+\textbf{Memorization and extraction.} Conditions under which models emit sensitive content are quantified, impacting privacy and intellectual property~\cite{carlini2021extracting,carlini2022quantifying}.\newline
+\textbf{Persistent deceptive behaviors.} Training-induced behaviors may interact with injection/leakage risks in integrated systems~\cite{anthropic2024sleeper}.
+
+\section{Methodology}
+\subsection{Threat models}
+\textbf{Prompt injection:} Attacker controls user inputs and/or untrusted documents/web pages consumed by RAG/agents; goals include instruction override, system prompt exposure, and unsafe tool invocation.
+
+\textbf{Data leakage:} (a) training-time memorization extraction; (b) runtime exfiltration from RAG stores, prompts, tools, or environment.
+
+\textbf{Adversary capabilities:} Black-box model access; ability to insert/host content in the RAG corpus or linked pages; no privileged tool access beyond the application interface.
+
+\subsection{Systems under test}
+\textbf{RAG pipeline:} retriever + ranker + prompt constructor + generator; untrusted corpus with clean and adversarial variants.
+
+\textbf{Tool-using agent:} minimal toolset (web fetcher, sandboxed filesystem read, simple API) with JSON schemas and scoped credentials.
+
+\textbf{Models:} one open-weight model and one hosted model (where permitted) to assess cross-model effects.
+
+\subsection{Attacks}
+\textbf{Indirect prompt injection:} documents with hidden instructions to exfiltrate canaries/system prompts, override tasks, or induce tool misuse~\cite{greshake2023prompt}.
+
+\textbf{Web/HTML payloads:} markup-based instructions (e.g., HTML comments/attributes/alt-text) that survive preprocessing.
+
+\textbf{Universal jailbreak prompts:} compare injection results with baseline jailbreak-style prompts~\cite{zou2023universal}.
+
+\textbf{Data leakage:} (Runtime) plant unique canary secrets in the RAG corpus and tool-accessible stores; probe with benign and adversarial prompts; measure leak rate. (Training-time) evaluate memorization extraction on public models using canary techniques where permitted~\cite{carlini2021extracting,carlini2022quantifying}.
+
+\subsection{Defenses (evaluated singly and as layers)}
+\textbf{Prompt/tool hardening:} least-privilege system prompts; explicit refusal and instruction-boundary templates; JSON-only function calls; parameter allowlists.
+
+\textbf{Content pipeline:} HTML/JS/CSS stripping/neutralization; instruction delimiting/quoting; source domain allowlists; per-document trust tiers; retrieval filtering; prompt-time de-injection transforms.
+
+\textbf{Guardrails:} input guards for injection; output guards for policy/secrets; DLP/redaction; canary detectors; rate limiting and review for high-risk actions.
+
+\textbf{Isolation and provenance:} sandbox tools; scoped credentials; no default network/file access; provenance logging and auditability.
+
+\subsection{Datasets and metrics}
+Corpora: mixture of clean documents with templated adversarial content; synthetic canaries in corpus and tool stores; benign tasks for utility.
+
+Metrics: ASR for injection goals; canary leakage rate and tokens/time-to-leak; guard TPR/FPR; utility retention; latency and cost overhead. Report confidence intervals across 3+ seeds and diverse prompts; test robustness to paraphrasing and minor content changes.
+
+\subsection{Procedure and ethics}
+Baseline $\rightarrow$ incrementally add defenses $\rightarrow$ ablations to quantify contributions. Log full traces; redact secrets; fix seeds; version corpora. Use only synthetic secrets; sandbox tools; comply with institutional policies.
+
+\section*{References}
+\begin{thebibliography}{99}
+\bibitem{greshake2023prompt} N. Greshake, S. Abdelnabi, M. Mishra, et al., ``Not What You’ve Signed Up For: Compromising Real-World LLM-Integrated Applications with Indirect Prompt Injection,'' arXiv preprint, 2023.
+
+\bibitem{carlini2021extracting} N. Carlini, F. Tram\'er, E. Wallace, et al., ``Extracting Training Data from Large Language Models,'' in Proc. USENIX Security, 2021.
+
+\bibitem{carlini2022quantifying} N. Carlini, F. Tram\'er, D. Song, et al., ``Quantifying Memorization Across Neural Language Models,'' arXiv preprint, 2022.
+
+\bibitem{zou2023universal} A. Zou, Z. Wang, S. Kolter, et al., ``Universal and Transferable Adversarial Attacks on Aligned Language Models,'' arXiv preprint, 2023.
+
+\bibitem{anthropic2024sleeper} Anthropic, ``Sleeper Agents: Training Deceptive LLMs that Persist,'' arXiv preprint, 2024.
+\end{thebibliography}
+
+\end{document}
+
