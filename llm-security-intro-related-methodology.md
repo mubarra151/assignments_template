@@ -6,11 +6,11 @@ This work focuses on these two risks in practical LLM applications. We (1) forma
 
 ### Related Work
 
-- Prompt injection in RAG/agents: Foundational analyses show untrusted content can override system instructions, exfiltrate secrets, and induce unsafe tool use in real applications [1]. Follow-on work demonstrates universal/transferable jailbreak-style attacks on aligned models [4] and highlights multi-turn escalation as well as markup/HTML/CSS-based payloads that survive naive sanitization. Industry guidance (OWASP LLM Top 10) elevates prompt injection and data exfiltration as primary risks for LLM apps [5].
+- Prompt injection in RAG/agents: Foundational analyses show untrusted content can override system instructions, exfiltrate secrets, and induce unsafe tool use in real applications [1]. Follow-on work demonstrates universal/transferable jailbreak-style attacks on aligned models [4] and highlights multi-turn escalation as well as markup/HTML/CSS-based payloads that survive naive sanitization.
 
-- Data leakage and memorization: Studies demonstrate extraction of rare or verbatim sequences from LLMs and quantify conditions that increase leakage (model size, duplication, temperature) [2],[3]. Runtime leakage in RAG/agents includes canary exfiltration from vector stores and credentials/secrets disclosure via tool calls or system prompt extraction [1]. Separate lines of work explore safety-degrading/backdoor behaviors that may interact with injection/leakage risks in integrated systems [6].
+- Data leakage and memorization: Studies demonstrate extraction of rare or verbatim sequences from LLMs and quantify conditions that increase leakage (model size, duplication, temperature) [2],[3]. Runtime leakage in RAG/agents includes canary exfiltration from vector stores and credentials/secrets disclosure via tool calls or system prompt extraction [1]. Separate lines of work explore safety-degrading/backdoor behaviors that may interact with injection/leakage risks in integrated systems [5].
 
-- Defenses: Proposed mitigations include least-privilege system prompts and explicit refusal policies; content sanitization and domain allowlists; LLM-based input/output guards (safety/PII/DLP); canary tokens and leakage detection; and architectural isolation for tools and credentials [5]. Practical evaluations often find that layered controls are necessary and that adaptive attacks reduce single-defense effectiveness.
+- Defenses: Proposed mitigations include least-privilege system prompts and explicit refusal policies; content sanitization and domain allowlists; LLM-based input/output guards (safety/PII/DLP); canary tokens and leakage detection; and architectural isolation for tools and credentials. Practical evaluations often find that layered controls are necessary and that adaptive attacks reduce single-defense effectiveness.
 
 ### Methodology
 
@@ -57,7 +57,5 @@ This work focuses on these two risks in practical LLM applications. We (1) forma
 
 [4] A. Zou, Z. Wang, S. Kolter, et al., “Universal and Transferable Adversarial Attacks on Aligned Language Models,” arXiv preprint, 2023.
 
-[5] OWASP, “Top 10 for Large Language Model Applications,” Project guidance, 2023–2024.
-
-[6] Anthropic, “Sleeper Agents: Training Deceptive LLMs that Persist,” arXiv preprint, 2024.
+[5] Anthropic, “Sleeper Agents: Training Deceptive LLMs that Persist,” arXiv preprint, 2024.
 

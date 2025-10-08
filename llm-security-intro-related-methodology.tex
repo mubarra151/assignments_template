@@ -14,11 +14,11 @@ Large Language Models (LLMs) enable natural-language interfaces, retrieval-augme
 This work focuses on these two risks in practical LLM applications. We (1) formalize threat models for direct and indirect prompt injection and for training-time versus runtime data leakage; (2) empirically evaluate representative attacks against RAG pipelines and tool-using agents; (3) measure the effectiveness and cost of defenses (prompt/tool hardening, sanitization, guard models, isolation, DLP/redaction, provenance); and (4) provide actionable guidance with quantified security--utility trade-offs.
 
 \section{Related Work}
-\textbf{Prompt injection in RAG/agents.} Foundational analyses show untrusted content can override system instructions, exfiltrate secrets, and induce unsafe tool use in real applications~\cite{greshake2023prompt}. Follow-on work demonstrates universal/transferable jailbreak-style attacks on aligned models~\cite{zou2023universal} and highlights multi-turn escalation as well as markup/HTML/CSS-based payloads that survive naive sanitization. Industry guidance (OWASP LLM Top 10) elevates prompt injection and data exfiltration as primary risks for LLM apps~\cite{owasp2023llm}.
+\textbf{Prompt injection in RAG/agents.} Foundational analyses show untrusted content can override system instructions, exfiltrate secrets, and induce unsafe tool use in real applications~\cite{greshake2023prompt}. Follow-on work demonstrates universal/transferable jailbreak-style attacks on aligned models~\cite{zou2023universal} and highlights multi-turn escalation as well as markup/HTML/CSS-based payloads that survive naive sanitization.
 
 \textbf{Data leakage and memorization.} Studies demonstrate extraction of rare or verbatim sequences from LLMs and quantify conditions that increase leakage (model size, duplication, temperature)~\cite{carlini2021extracting,carlini2022quantifying}. Runtime leakage in RAG/agents includes canary exfiltration from vector stores and credentials/secrets disclosure via tool calls or system prompt extraction~\cite{greshake2023prompt}. Separate lines of work explore safety-degrading/backdoor behaviors that may interact with injection/leakage risks in integrated systems~\cite{anthropic2024sleeper}.
 
-\textbf{Defenses.} Proposed mitigations include least-privilege system prompts and explicit refusal policies; content sanitization and domain allowlists; LLM-based input/output guards (safety/PII/DLP); canary tokens and leakage detection; and architectural isolation for tools and credentials~\cite{owasp2023llm}. Practical evaluations often find that layered controls are necessary and that adaptive attacks reduce single-defense effectiveness.
+\textbf{Defenses.} Proposed mitigations include least-privilege system prompts and explicit refusal policies; content sanitization and domain allowlists; LLM-based input/output guards (safety/PII/DLP); canary tokens and leakage detection; and architectural isolation for tools and credentials. Practical evaluations often find that layered controls are necessary and that adaptive attacks reduce single-defense effectiveness.
 
 \section{Methodology}
 \subsection{Threat models}
@@ -74,8 +74,6 @@ Baseline $\rightarrow$ add defenses incrementally $\rightarrow$ ablations to qua
 \bibitem{carlini2022quantifying} N. Carlini, F. Tram\'er, D. Song, et al., ``Quantifying Memorization Across Neural Language Models,'' arXiv preprint, 2022.
 
 \bibitem{zou2023universal} A. Zou, Z. Wang, S. Kolter, et al., ``Universal and Transferable Adversarial Attacks on Aligned Language Models,'' arXiv preprint, 2023.
-
-\bibitem{owasp2023llm} OWASP, ``Top 10 for Large Language Model Applications,'' Project guidance, 2023--2024.
 
 \bibitem{anthropic2024sleeper} Anthropic, ``Sleeper Agents: Training Deceptive LLMs that Persist,'' arXiv preprint, 2024.
 \end{thebibliography}
